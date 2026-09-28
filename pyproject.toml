@@ -1,0 +1,17 @@
+[project]
+name = "nqueens-sat"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "ortools>=9.15.6755",
+    "python-sat>=1.9.dev15",
+]
+
+[project.scripts]
+nqueens-sat = "nqueens_sat:main"
+
+[build-system]
+requires = ["uv_build>=0.12.19,<0.13.0"]
+build-backend = "uv_build"
