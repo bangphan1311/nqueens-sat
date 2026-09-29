@@ -4,7 +4,7 @@
  out  : (clauses, new top)
 
 """
-
+from pysat.card import CardEnc, EncType
 
 
 def amo_pairwise(lits, top):
@@ -31,8 +31,18 @@ def amo_seqcounter(lits, top):
     clauses.append([-lits[n - 1], -s[n - 2]])  
     return clauses, top
 
+def _pysat_amo(lits, top, enc_type):
+    """Ham dung chung: goi CardEnc.atmost cua PySAT voi 1 loai encoding."""
+    cnf = CardEnc.atmost(lits=lits, bound=1, top_id=top, encoding=enc_type)
+    new_top = max(top, cnf.nv)
+    return cnf.clauses, new_top
+
+
+def amo_bitwise(lits, top):
+    return _pysat_amo(lits, top, EncType.bitwise)
 
 AMO_ENCODINGS = {
     "pairwise": amo_pairwise,
     "seqcounter": amo_seqcounter,
+    "binary": amo_bitwise,
 }
