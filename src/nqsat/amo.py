@@ -70,9 +70,39 @@ def amo_commander(lits, top, group_size=3):
     cl, top = amo_commander(commanders, top, group_size)
     clauses.extend(cl)
     return clauses, top
+
+def amo_product(lits, top):
+    import math
+    n = len(lits)
+    if n <= 1:
+        return [], top
+
+    p = math.ceil(math.sqrt(n))   
+    q = math.ceil(n / p)          
+
+    row_vars = list(range(top + 1, top + 1 + p))
+    top += p
+    col_vars = list(range(top + 1, top + 1 + q))
+    top += q
+
+    clauses = []
+
+    cl, top = amo_pairwise(row_vars, top)
+    clauses.extend(cl)
+    cl, top = amo_pairwise(col_vars, top)
+    clauses.extend(cl)
+
+    for i, x in enumerate(lits):
+        r = i // q
+        c = i % q
+        clauses.append([-x, row_vars[r]])   
+        clauses.append([-x, col_vars[c]])   
+
+    return clauses, top
 AMO_ENCODINGS = {
     "pairwise": amo_pairwise,
     "seqcounter": amo_seqcounter,
     "binary": amo_bitwise,
     "commander": amo_commander,
+    "product": amo_product,
 }
