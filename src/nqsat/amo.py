@@ -41,8 +41,38 @@ def _pysat_amo(lits, top, enc_type):
 def amo_bitwise(lits, top):
     return _pysat_amo(lits, top, EncType.bitwise)
 
+def amo_commander(lits, top, group_size=3):
+    if len(lits) <= 1:
+        return [], top
+
+    if len(lits) <= group_size:
+        return amo_pairwise(lits, top)
+
+    clauses = []
+    commanders = []
+    for i in range(0, len(lits), group_size):
+        group = lits[i:i + group_size]
+        if len(group) == 1:
+            commanders.append(group[0])
+            continue
+
+        top += 1
+        c = top  
+
+        cl, top = amo_pairwise(group, top)
+        clauses.extend(cl)
+        for x in group:
+            clauses.append([c, -x])  
+
+        clauses.append([-c] + group) 
+        commanders.append(c)
+
+    cl, top = amo_commander(commanders, top, group_size)
+    clauses.extend(cl)
+    return clauses, top
 AMO_ENCODINGS = {
     "pairwise": amo_pairwise,
     "seqcounter": amo_seqcounter,
     "binary": amo_bitwise,
+    "commander": amo_commander,
 }
