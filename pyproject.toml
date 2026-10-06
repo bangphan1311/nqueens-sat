@@ -9,6 +9,7 @@ dependencies = [
     "docplex>=2.32.264",
     "gurobipy>=13.0.3",
     "ortools>=9.15.6755",
+    "pycryptosat>=5.16.0",
     "python-sat>=1.9.dev15",
 ]
 

@@ -113,6 +113,7 @@ dependencies = [
     { name = "docplex" },
     { name = "gurobipy" },
     { name = "ortools" },
+    { name = "pycryptosat" },
     { name = "python-sat" },
 ]
 
@@ -122,6 +123,7 @@ requires-dist = [
     { name = "docplex", specifier = ">=2.32.264" },
     { name = "gurobipy", specifier = ">=13.0.3" },
     { name = "ortools", specifier = ">=9.15.6755" },
+    { name = "pycryptosat", specifier = ">=5.16.0" },
     { name = "python-sat", specifier = ">=1.9.dev15" },
 ]
 
@@ -561,6 +563,33 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/9b/ca/25afc144934014700c52e05103c2421997482d561f3101ff352e1292fb81/protobuf-6.33.6-cp39-abi3-manylinux2014_s390x.whl", hash = "sha256:c96c37eec15086b79762ed265d59ab204dabc53056e3443e702d2681f4b39ce3", size = 339381, upload-time = "2026-03-18T19:04:54.616Z" },
     { url = "https://files.pythonhosted.org/packages/16/92/d1e32e3e0d894fe00b15ce28ad4944ab692713f2e7f0a99787405e43533a/protobuf-6.33.6-cp39-abi3-manylinux2014_x86_64.whl", hash = "sha256:e9db7e292e0ab79dd108d7f1a94fe31601ce1ee3f7b79e0692043423020b0593", size = 323436, upload-time = "2026-03-18T19:04:55.768Z" },
     { url = "https://files.pythonhosted.org/packages/c4/72/02445137af02769918a93807b2b7890047c32bfb9f90371cbc12688819eb/protobuf-6.33.6-py3-none-any.whl", hash = "sha256:77179e006c476e69bf8e8ce866640091ec42e1beb80b213c3900006ecfba6901", size = 170656, upload-time = "2026-03-18T19:04:59.826Z" },
+]
+
+[[package]]
+name = "pycryptosat"
+version = "5.16.0"
+source = { registry = "https://pypi.org/simple" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a7/e8/d868ae1ee5054cfdb884363b9d92e9c418f1231e598ef3756c934063c2b7/pycryptosat-5.16.0-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:a3bf9531225431f487f728b7c1e404459086f87a855982b80a174e50db05b2a3", size = 1330629, upload-time = "2026-09-21T22:26:25.048Z" },
+    { url = "https://files.pythonhosted.org/packages/cf/86/fbbe05e7721ab8925d5759056f4f45b529a68c795a19a658b60f38fcd630/pycryptosat-5.16.0-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:a8d17318e2edf7a7ecd2951d11177fd2eec8fb471305cabc28587d6226bf54ae", size = 1231517, upload-time = "2026-09-21T22:26:26.727Z" },
+    { url = "https://files.pythonhosted.org/packages/94/e7/969388e4c323a19f0c9007c5713be3dba1810d71b83349f281c6b9c36949/pycryptosat-5.16.0-cp310-cp310-manylinux_2_34_aarch64.whl", hash = "sha256:873b14d9c6dc1ce499347e4b37a434d6daba7ca22078fc044ef4035f4e5e11df", size = 1561711, upload-time = "2026-09-21T22:26:28.326Z" },
+    { url = "https://files.pythonhosted.org/packages/53/25/768b3868e0e18c9963cbfc39cbec03d64bacb4e2f714902e8fdb495fe43e/pycryptosat-5.16.0-cp310-cp310-manylinux_2_34_x86_64.whl", hash = "sha256:5a057b51432902b8422ec11f392a765229c09383b2e4ee5960143b7f5b214cfd", size = 1715881, upload-time = "2026-09-21T22:26:29.677Z" },
+    { url = "https://files.pythonhosted.org/packages/24/89/768b2ab8d85d9132285fe051dec74a5c5d02b8034e2ebf76f0fb39180bbf/pycryptosat-5.16.0-cp310-cp310-win_amd64.whl", hash = "sha256:9801e6c9d09e2e6e0192779e3585eff792be70f9a354f5a7653a5aef6ce5cc1e", size = 2360807, upload-time = "2026-09-21T22:26:31.129Z" },
+    { url = "https://files.pythonhosted.org/packages/3c/ed/f8edd5003e39af2fdaaac964f3c220d5e641b176f042d615d8a5b97af3b1/pycryptosat-5.16.0-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:06e5d82d8bf159edc87c3eeb09753781e179095287b1f5bc0a07b766af9cdd3b", size = 1330627, upload-time = "2026-09-21T22:26:32.863Z" },
+    { url = "https://files.pythonhosted.org/packages/bf/90/669e96da5cfaec7b232629a29f2793a32db88a7a13f5262bd2769b90abac/pycryptosat-5.16.0-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:61f28c7495c87fb95a6a5d0ebac287c8a034e5ac5414a581fb3fbdd8b60d5735", size = 1231519, upload-time = "2026-09-21T22:26:34.283Z" },
+    { url = "https://files.pythonhosted.org/packages/10/df/77c166315a4abc9ae91b01e34ed035eb57a4cd32a4d68465b97edad0a956/pycryptosat-5.16.0-cp311-cp311-manylinux_2_34_aarch64.whl", hash = "sha256:d4985ae93595a7a1d309b8077bc1e796261a5700e621cddc15c3299b55f5e156", size = 1561712, upload-time = "2026-09-21T22:26:35.598Z" },
+    { url = "https://files.pythonhosted.org/packages/6f/37/ec77e5d845f6f8a233de0b32880ab07c2e12a3da6625726ebe1c72e5ff05/pycryptosat-5.16.0-cp311-cp311-manylinux_2_34_x86_64.whl", hash = "sha256:5944e0dbcfa048c48b34b6465637cab90c242a2d5ec69b4cc71de0ecf5cdcd78", size = 1715878, upload-time = "2026-09-21T22:26:37.237Z" },
+    { url = "https://files.pythonhosted.org/packages/08/89/05dc717c686e499b469c9a9f0a0c2d43e590fd1c5e821777f34365878303/pycryptosat-5.16.0-cp311-cp311-win_amd64.whl", hash = "sha256:718f01a5ea62ffef45809e59424e2f3d6927d1c9cd961a8b443132aa73db04dd", size = 2360804, upload-time = "2026-09-21T22:26:38.857Z" },
+    { url = "https://files.pythonhosted.org/packages/af/ee/0d84ab0f6b9490d80c6e9df9ce24edbba889c3dc85bf339e4a6e3cf98825/pycryptosat-5.16.0-cp312-cp312-macosx_10_13_x86_64.whl", hash = "sha256:fd6911936e4604050e8279ba9d4196a736e2d33712c8221420be155223d94bc7", size = 1330800, upload-time = "2026-09-21T22:26:40.758Z" },
+    { url = "https://files.pythonhosted.org/packages/12/de/499e682647414f7575dd1d731dba3ac51a51746be2dbaa42968bb84e355b/pycryptosat-5.16.0-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:1123d2f526d13781f28e8a1abfa27e2030d628397c3c073ddc420670b814feeb", size = 1231486, upload-time = "2026-09-21T22:26:42.079Z" },
+    { url = "https://files.pythonhosted.org/packages/91/99/b9b76ef02587f2dc44251619bb419d16c207bd6962f70d1dfa4af84fd625/pycryptosat-5.16.0-cp312-cp312-manylinux_2_34_aarch64.whl", hash = "sha256:82b9b55b3bfeb2e711832b6361023f11e6a4c57b5a3f5748a2336a36d2de3b89", size = 1561814, upload-time = "2026-09-21T22:26:43.56Z" },
+    { url = "https://files.pythonhosted.org/packages/f2/c6/5d9a714fc727865ad22c81f8531aee767d227e3789c812c122b1ee2b38b8/pycryptosat-5.16.0-cp312-cp312-manylinux_2_34_x86_64.whl", hash = "sha256:1625bc0547b6658387ce07cfa991878b79d54e1f8d8c71eec36290ca1761de29", size = 1716118, upload-time = "2026-09-21T22:26:44.89Z" },
+    { url = "https://files.pythonhosted.org/packages/a8/b9/8aff53d6b8823432fee21fd84536746b3815459f37f1864ccfe702b32a98/pycryptosat-5.16.0-cp312-cp312-win_amd64.whl", hash = "sha256:fe553f38ff802c4317eeeaabe9469739da46acce563ff2d27c827df8fb220b48", size = 2360954, upload-time = "2026-09-21T22:26:46.476Z" },
+    { url = "https://files.pythonhosted.org/packages/18/e0/d8c161451aa095661579b508c2bd749d83dc989b654634120a01703bd482/pycryptosat-5.16.0-cp313-cp313-macosx_10_13_x86_64.whl", hash = "sha256:bd823eb89f9c88c3b82eaf7ca8e3e0749f8a7e2a7b22ba0330458926b692b755", size = 1330798, upload-time = "2026-09-21T22:26:47.777Z" },
+    { url = "https://files.pythonhosted.org/packages/32/df/be4a52537c7e6ba626daaf9c0394061e6e1f430c7091d3b4616f1395a3d1/pycryptosat-5.16.0-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:ccf92da313515063fa7ed2ec2835d5dbecdcab08bc4e5776923df8465bdf9180", size = 1231486, upload-time = "2026-09-21T22:26:49.511Z" },
+    { url = "https://files.pythonhosted.org/packages/c9/3d/76e6b919cd05d8567e2195d73ea7998ad05f334a23fd07da8ec523735170/pycryptosat-5.16.0-cp313-cp313-manylinux_2_34_aarch64.whl", hash = "sha256:8cd5c50619d029785c1d78072f26f9d78cce86f3f52d51c9c57184195b1e5a65", size = 1561822, upload-time = "2026-09-21T22:26:50.862Z" },
+    { url = "https://files.pythonhosted.org/packages/37/13/d5776145bd9da08d911fb85f9db88ae2a8e6ca60223a4cf655230cb13aa7/pycryptosat-5.16.0-cp313-cp313-manylinux_2_34_x86_64.whl", hash = "sha256:383741a32d0fda704d29f84ab954f824c3a37658b28aff9998ee484009dabf0c", size = 1716121, upload-time = "2026-09-21T22:26:52.439Z" },
+    { url = "https://files.pythonhosted.org/packages/ae/df/a0b46fb66e5341a8b694246a882c3148e034994d9b97191042c697a964c9/pycryptosat-5.16.0-cp313-cp313-win_amd64.whl", hash = "sha256:f05323b9dd7be059719fb6e6ffa390af06d966945f2723b11c69d34dea51eb1e", size = 2360963, upload-time = "2026-09-21T22:26:53.893Z" },
 ]
 
 [[package]]
