@@ -45,8 +45,8 @@ def _solve_kissat(n, clauses):
     return "SAT", decode(n, true_vars)
 
 
-def solve_sat(n, amo, solver):
-    clauses, _ = build_cnf(n, amo)
+def solve_sat(n, amo, solver, sym=False):
+    clauses, _ = build_cnf(n, amo, sym)
 
     if solver == "kissat":
         return _solve_kissat(n, clauses)

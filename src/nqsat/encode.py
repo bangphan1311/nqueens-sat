@@ -2,7 +2,7 @@ def var(n, r, c):
     return r * n + c + 1
 
 
-def build_cnf(n, amo):
+def build_cnf(n, amo, sym=False):
     clauses = []
     top = n * n
 
@@ -28,6 +28,12 @@ def build_cnf(n, amo):
     for s in range(0, 2 * n - 1):
         lits = [var(n, r, s - r) for r in range(n) if 0 <= s - r < n]
         add_amo(lits)
+
+    if sym:
+        # vertical-reflection symmetry breaking: row-0 queen in the left half
+        # (including the middle column when n is odd)
+        for c in range((n - 1) // 2 + 1, n):
+            clauses.append([-var(n, 0, c)])
 
     return clauses, top
 

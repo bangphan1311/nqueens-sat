@@ -1,0 +1,24 @@
+% Mathematical models of the baselines, for the Background section.
+
+\subsection{MIP model (Gurobi, CPLEX MIP)}
+Let $x_{rc}\in\{0,1\}$ indicate a queen on cell $(r,c)$ of an $N\times N$ board.
+\begin{align}
+  \sum_{c=0}^{N-1} x_{rc} &= 1, && r = 0,\dots,N-1, \label{eq:mip-row}\\
+  \sum_{r=0}^{N-1} x_{rc} &\le 1, && c = 0,\dots,N-1, \label{eq:mip-col}\\
+  \sum_{r-c=d} x_{rc} &\le 1, && d = -(N-1),\dots,N-1, \label{eq:mip-diag}\\
+  \sum_{r+c=s} x_{rc} &\le 1, && s = 0,\dots,2N-2. \label{eq:mip-anti}
+\end{align}
+Constraints~\eqref{eq:mip-row} force one queen per row, so $N$ queens are placed and
+\eqref{eq:mip-col} then implies exactly one queen per column.
+
+\subsection{CP model (CPLEX CP, CP-SAT)}
+Let $q_i\in\{0,\dots,N-1\}$ be the column of the queen in row $i$.
+\begin{align}
+  &\operatorname{alldifferent}(q_0,\dots,q_{N-1}), \label{eq:cp-col}\\
+  &\operatorname{alldifferent}(q_0+0,\dots,q_{N-1}+(N-1)), \label{eq:cp-diag}\\
+  &\operatorname{alldifferent}(q_0-0,\dots,q_{N-1}-(N-1)). \label{eq:cp-anti}
+\end{align}
+
+\subsection{Boolean CP-SAT model}
+The same variables and constraints as the SAT encoding: $x_{rc}$ Boolean,
+\texttt{ExactlyOne} per row, \texttt{AtMostOne} per column, diagonal and anti-diagonal.
