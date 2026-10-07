@@ -31,3 +31,12 @@ under the same rules, so that timings are comparable.
 - Once a configuration fails (`TO`, `MO` or `ERR`) at some N, larger N are recorded
   as `SKIP` and not run.
 - Plain N-Queens is deterministic, so repetitions only measure timing noise.
+
+## Repetitions and seeds
+
+- Repetition 1 uses the original clause order. Repetitions >= 2 shuffle the clause
+  order with `random.Random(rep)`; the shuffle is not part of the timed quantity
+  (`t_total = t_encode + t_solve`). The median over repetitions is reported.
+- For the baselines, repetitions only measure timing noise (their models are fixed).
+- A configuration is skipped for larger N only when every repetition at some N failed
+  (`TO`, `MO` or `ERR`), or when a memory-out occurred (deterministic).

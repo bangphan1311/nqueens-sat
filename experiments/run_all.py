@@ -2,10 +2,12 @@ import argparse
 import csv
 import json
 import os
+import random
 import signal
 import subprocess
 import sys
 import time
+from collections import defaultdict
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "..", "src"))
@@ -21,11 +23,12 @@ BASELINES = {
 }
 COLS = ["solver", "encoding", "n", "rep", "sym", "status", "verify",
         "t_encode", "t_solve", "t_total", "nvars", "nclauses", "max_rss_mb"]
+FAIL = ("TO", "MO", "ERR")
 GRACE = 20  # seconds allowed on top of the limit for imports / process start-up
 
 
 # ---------------------------------------------------------------- child
-def child(solver, enc, n, timeout, sym):
+def child(solver, enc, n, timeout, sym, seed):
     import importlib
     from nqsat.status import normalize
     from nqsat.verify import verify
@@ -38,9 +41,13 @@ def child(solver, enc, n, timeout, sym):
         clauses, top = build_cnf(n, AMO[enc], sym)
         t1 = time.perf_counter()
         out["nvars"], out["nclauses"] = top, len(clauses)
-        status, queens = solve_clauses(n, clauses, solver)
+        if seed > 1:
+            random.Random(seed).shuffle(clauses)   # not timed
         t2 = time.perf_counter()
-        out["t_encode"], out["t_solve"], out["t_total"] = t1 - t0, t2 - t1, t2 - t0
+        status, queens = solve_clauses(n, clauses, solver)
+        t3 = time.perf_counter()
+        out["t_encode"], out["t_solve"] = t1 - t0, t3 - t2
+        out["t_total"] = (t1 - t0) + (t3 - t2)
     else:
         mod, fn = BASELINES[solver]
         f = getattr(importlib.import_module(mod), fn)
@@ -75,9 +82,9 @@ def group_rss_mb(pgid):
     return total_kb / 1024
 
 
-def run_one(solver, enc, n, timeout, sym, mem_mb):
+def run_one(solver, enc, n, timeout, sym, mem_mb, seed):
     cmd = [sys.executable, os.path.abspath(__file__), "--child",
-           solver, enc, str(n), str(timeout), str(int(sym))]
+           solver, enc, str(n), str(timeout), str(int(sym)), str(seed)]
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
                          text=True, start_new_session=True)
     start, peak, forced = time.time(), 0.0, None
@@ -128,12 +135,14 @@ def fmt(x):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--ns", type=int, nargs="+",
-                    default=[8, 16, 32, 64, 100, 150, 200, 300, 500, 1000])
+                    default=[8, 16, 32, 64, 100, 150, 200, 300, 500, 1000],
+                    help="must be in ascending order (SKIP logic relies on it)")
     ap.add_argument("--timeout", type=int, default=120)
     ap.add_argument("--reps", type=int, default=1)
     ap.add_argument("--sym", action="store_true", help="symmetry breaking (SAT solvers only)")
     ap.add_argument("--mem-frac", type=float, default=0.8)
     ap.add_argument("--only", nargs="+", default=None, help="restrict to these solvers")
+    ap.add_argument("--encs", nargs="+", default=None, help="restrict SAT encodings")
     ap.add_argument("--out", default=os.path.join(HERE, "..", "results", "run_all.csv"))
     a = ap.parse_args()
 
@@ -142,20 +151,25 @@ def main():
     configs += [(b, "-") for b in BASELINES]
     if a.only:
         configs = [c for c in configs if c[0] in a.only]
+    if a.encs:
+        configs = [c for c in configs if c[1] in a.encs or c[1] == "-"]
 
-    done, dead = set(), {}
+    done, stat, dead_n = set(), defaultdict(list), {}
     if os.path.exists(a.out):
-        with open(a.out) as f:
+        with open(a.out, newline="") as f:
             for r in csv.DictReader(f):
                 done.add((r["solver"], r["encoding"], int(r["n"]), int(r["rep"]), r["sym"]))
-                if r["status"] in ("TO", "MO", "ERR"):
-                    k = (r["solver"], r["encoding"])
-                    dead[k] = min(dead.get(k, 10**9), int(r["n"]))
+                if r["status"] != "SKIP":
+                    stat[(r["solver"], r["encoding"], int(r["n"]))].append(r["status"])
+        for (s, e, n), sts in stat.items():
+            if len(sts) >= a.reps and all(x in FAIL for x in sts):
+                dead_n[(s, e)] = min(dead_n.get((s, e), 10**9), n)
 
     new = not os.path.exists(a.out)
-    print(f"timeout={a.timeout}s  mem limit={mem_mb:.0f} MB  reps={a.reps}  sym={a.sym}")
+    print(f"timeout={a.timeout}s  mem limit={mem_mb:.0f} MB  reps={a.reps}  sym={a.sym}  "
+          f"configs={len(configs)}", flush=True)
     with open(a.out, "a", newline="") as fh:
-        w = csv.DictWriter(fh, fieldnames=COLS)
+        w = csv.DictWriter(fh, fieldnames=COLS, lineterminator="\n")
         if new:
             w.writeheader()
 
@@ -166,8 +180,9 @@ def main():
 
         for n in a.ns:
             for s, e in configs:
-                symstr = str(int(a.sym and s in SAT_SOLVERS))
-                d = dead.get((s, e))
+                symflag = a.sym and s in SAT_SOLVERS
+                symstr = str(int(symflag))
+                d = dead_n.get((s, e))
                 if d is not None and n > d:
                     if (s, e, n, 1, symstr) not in done:
                         emit(s, e, n, 1, symstr, {"status": "SKIP"})
@@ -175,19 +190,21 @@ def main():
                 for rep in range(1, a.reps + 1):
                     if (s, e, n, rep, symstr) in done:
                         continue
-                    if d == n:
-                        break
-                    res = run_one(s, e, n, a.timeout, a.sym and s in SAT_SOLVERS, mem_mb)
+                    res = run_one(s, e, n, a.timeout, symflag, mem_mb, rep)
                     emit(s, e, n, rep, symstr, res)
+                    stat[(s, e, n)].append(res["status"])
                     print(f"N={n:5d} {s:14s} {e:11s} rep{rep} {res['status']:4s} "
-                          f"t={fmt(res.get('t_total', ''))} rss={res['max_rss_mb']}MB")
-                    if res["status"] in ("TO", "MO", "ERR"):
-                        dead[(s, e)] = min(dead.get((s, e), 10**9), n)
-                        break
+                          f"t={fmt(res.get('t_total', ''))} rss={res['max_rss_mb']}MB", flush=True)
+                    if res["status"] == "MO":
+                        break          # memory failure is deterministic
+                sts = stat[(s, e, n)]
+                if sts and all(x in FAIL for x in sts) and (len(sts) >= a.reps or "MO" in sts):
+                    dead_n[(s, e)] = min(dead_n.get((s, e), 10**9), n)
 
 
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "--child":
-        child(sys.argv[2], sys.argv[3], int(sys.argv[4]), int(sys.argv[5]), bool(int(sys.argv[6])))
+        child(sys.argv[2], sys.argv[3], int(sys.argv[4]), int(sys.argv[5]),
+              bool(int(sys.argv[6])), int(sys.argv[7]))
     else:
         main()
