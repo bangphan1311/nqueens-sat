@@ -45,9 +45,8 @@ def _solve_kissat(n, clauses):
     return "SAT", decode(n, true_vars)
 
 
-def solve_sat(n, amo, solver, sym=False):
-    clauses, _ = build_cnf(n, amo, sym)
-
+def solve_clauses(n, clauses, solver):
+    """Solve an already-built CNF with the chosen SAT solver."""
     if solver == "kissat":
         return _solve_kissat(n, clauses)
 
@@ -67,6 +66,11 @@ def solve_sat(n, amo, solver, sym=False):
         if s.solve():
             return "SAT", decode(n, s.get_model())
         return "UNSAT", None
+
+
+def solve_sat(n, amo, solver, sym=False):
+    clauses, _ = build_cnf(n, amo, sym)
+    return solve_clauses(n, clauses, solver)
 
 
 if __name__ == "__main__":

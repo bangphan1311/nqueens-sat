@@ -18,3 +18,16 @@ under the same rules, so that timings are comparable.
   (see `src/nqsat/status.py`).
 - **Repetitions:** several seeds where randomness applies; the median is reported.
 - **Machine and versions:** see `results/environment.md`.
+
+## Measurement details (run_all.py)
+
+- Default limit is 120 s per run. A run that finishes but whose `t_total` exceeds
+  the limit is recorded as `TO`.
+- `t_encode` and `t_solve` are separate for the SAT solvers. For the baselines the
+  model build and the solve are one call, so only `t_total` is recorded.
+- Kissat's `t_solve` includes writing the DIMACS file and starting the process.
+- Memory is the resident memory of the whole process group (so Kissat is counted),
+  polled every 0.2 s. Peak is stored in `max_rss_mb`.
+- Once a configuration fails (`TO`, `MO` or `ERR`) at some N, larger N are recorded
+  as `SKIP` and not run.
+- Plain N-Queens is deterministic, so repetitions only measure timing noise.

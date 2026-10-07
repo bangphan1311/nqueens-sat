@@ -11,7 +11,7 @@ def solve_cpsat(n, time_limit=60):
 
     solver = cp_model.CpSolver()
     solver.parameters.max_time_in_seconds = time_limit
-    solver.parameters.num_search_workers = 1
+    solver.parameters.num_workers = 1
 
     result = solver.Solve(model)
     if result in (cp_model.OPTIMAL, cp_model.FEASIBLE):
