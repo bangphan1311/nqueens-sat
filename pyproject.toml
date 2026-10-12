@@ -1,5 +1,5 @@
 [project]
-name = "nqueens-sat"
+name = "nqsat"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
@@ -12,9 +12,6 @@ dependencies = [
     "pycryptosat>=5.16.0",
     "python-sat>=1.9.dev15",
 ]
-
-[project.scripts]
-nqueens-sat = "nqueens_sat:main"
 
 [build-system]
 requires = ["uv_build>=0.12.19,<0.13.0"]
