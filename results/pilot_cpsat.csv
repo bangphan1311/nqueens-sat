@@ -1,0 +1,5 @@
+n,solver,encoding,rep,nvars,nclauses,t_encode,t_solve,t_total,status
+8,cpsat,-,0,0,0,0.0,0.005,0.3707,SAT
+8,cpsat_bool,-,0,0,0,0.0,0.0044,0.3563,SAT
+50,cpsat,-,0,0,0,0.0,0.1203,0.4797,SAT
+50,cpsat_bool,-,0,0,0,0.0,0.0903,0.4328,SAT

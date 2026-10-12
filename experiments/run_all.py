@@ -12,7 +12,7 @@ WORKER = os.path.join(HERE, "..", "src", "nqsat", "worker.py")
 
 SAT_SOLVERS = ["cadical", "glucose", "cryptominisat", "kissat"]
 ENCODINGS = ["pairwise", "seqcounter", "bitwise", "commander", "product"]
-BASELINES = ["cpsat", "gurobi", "cplex_mip", "cplex_cp"]
+BASELINES = ["cpsat", "cpsat_bool", "gurobi", "cplex_mip", "cplex_cp"]
 FIELDS = ["n", "solver", "encoding", "rep", "nvars", "nclauses",
           "t_encode", "t_solve", "t_total", "status"]
 

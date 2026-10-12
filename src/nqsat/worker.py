@@ -9,6 +9,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 SAT_SOLVERS = ["cadical", "glucose", "cryptominisat", "kissat"]
 BASELINES = {
     "cpsat": ("nqsat.solvers_cpsat", "solve_cpsat"),
+    "cpsat_bool": ("nqsat.solvers_cpsat", "solve_cpsat_bool"),
     "gurobi": ("nqsat.solvers_gurobi", "solve_gurobi"),
     "cplex_mip": ("nqsat.solvers_cplex_mip", "solve_cplex_mip"),
     "cplex_cp": ("nqsat.solvers_cplex_cp", "solve_cplex_cp"),
