@@ -43,14 +43,32 @@ def run_one(solver, enc, n, timeout, mem, sym=False):
 
 
 def load_done(path):
-    done, failed = set(), set()
+    done = set()
+    failed = {}
     if os.path.exists(path):
-        with open(path) as f:
+        with open(path, newline="", encoding="utf-8") as f:
             for r in csv.DictReader(f):
-                done.add((int(r["n"]), r["solver"], r["encoding"], int(r["rep"])))
-                if r["status"] in ("TO", "MO"):
-                    failed.add((r["solver"], r["encoding"]))
+                n = int(r["n"])
+                solver = r["solver"]
+                encoding = r["encoding"]
+                sym = int((r.get("sym") or "0").strip())
+                rep = int(r["rep"])
+                status = (r.get("status") or "").strip().upper()
+
+                done.add((n, solver, encoding, sym, rep))
+
+                # Keep the earliest rep=0 timeout/memory-out cutoff for
+                # each solver/encoding/symmetry configuration.
+                if rep == 0 and status in ("TO", "TIMEOUT", "MO", "MEMOUT"):
+                    config = (solver, encoding, sym)
+                    failed[config] = min(n, failed.get(config, n))
+
     return done, failed
+
+
+def should_skip(n, solver, encoding, sym, failed):
+    cutoff = failed.get((solver, encoding, int(sym)))
+    return cutoff is not None and n >= cutoff
 
 
 def main():
@@ -82,19 +100,24 @@ def main():
     for n in sorted(a.ns):
         for s, e in configs:
             for rep in range(a.reps):
-                if (n, s, e, rep) in done:
+                run_key = (n, s, e, int(a.sym), rep)
+                if run_key in done:
                     continue
-                if (s, e) in failed:
+
+                if should_skip(n, s, e, a.sym, failed):
                     row = {"status": "SKIP", "nvars": 0, "nclauses": 0,
                            "t_encode": 0, "t_solve": 0, "t_total": 0}
                 else:
                     row = run_one(s, e, n, a.timeout, a.mem_gb, a.sym)
                     if rep == 0 and row["status"] in ("TO", "MO"):
-                        failed.add((s, e))
+                        config = (s, e, int(a.sym))
+                        failed[config] = min(n, failed.get(config, n))
+
                 row.pop("error", None)
                 row.update(n=n, solver=s, encoding=e, sym=int(a.sym), rep=rep)
                 w.writerow({k: (round(v, 4) if isinstance(v, float) else v)
                             for k, v in row.items() if k in FIELDS})
+                done.add(run_key)
                 f.flush()
                 print(f"N={n:5d} {s:14s} {e:11s} rep={rep} "
                       f"{row['status']:5s} {row['t_total']:.2f}s", flush=True)
