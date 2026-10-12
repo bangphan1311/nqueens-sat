@@ -102,7 +102,7 @@ def amo_product(lits, top):
 AMO_ENCODINGS = {
     "pairwise": amo_pairwise,
     "seqcounter": amo_seqcounter,
-    "binary": amo_bitwise,
+    "bitwise": amo_bitwise,
     "commander": amo_commander,
     "product": amo_product,
 }
