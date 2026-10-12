@@ -6,6 +6,8 @@ import time
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
+from nqsat.status import normalize
+
 SAT_SOLVERS = ["cadical", "glucose", "cryptominisat", "kissat"]
 BASELINES = {
     "cpsat": ("nqsat.solvers_cpsat", "solve_cpsat"),
@@ -14,9 +16,6 @@ BASELINES = {
     "cplex_mip": ("nqsat.solvers_cplex_mip", "solve_cplex_mip"),
     "cplex_cp": ("nqsat.solvers_cplex_cp", "solve_cplex_cp"),
 }
-STATUS = {"SAT": "SAT", "UNSAT": "UNSAT", "TIMEOUT": "TO", "ERROR": "ERR"}
-
-
 def main():
     solver, enc = sys.argv[1], sys.argv[2]
     sym = len(sys.argv) > 6 and sys.argv[6] == "1"
@@ -44,7 +43,7 @@ def main():
             t1 = time.perf_counter()
             status, queens = f(n, time_limit=tl)
             out["t_solve"] = time.perf_counter() - t1
-        status = STATUS.get(status, "ERR")
+        status = normalize(status)
         if status == "SAT" and not verify(n, queens):
             status = "ERR"
         out["status"] = status
