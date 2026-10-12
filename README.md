@@ -60,17 +60,17 @@ after it. To make sure uv never touches a patched environment, run commands with
 ## Tests
 
 ```bash
-python -m compileall -q src experiments
-uv run python experiments/smoke_test.py
-uv run python experiments/test_encoding.py      # known solution counts, N = 1..10, 5 encodings
-uv run python experiments/test_sym.py           # symmetry breaking; ends with ALL OK
-uv run python experiments/test_runner_resume.py # resume and skip logic of run_all.py
+.venv/bin/python -m compileall -q src experiments
+.venv/bin/python experiments/smoke_test.py
+.venv/bin/python experiments/test_encoding.py      # known solution counts, N = 1..10, 5 encodings
+.venv/bin/python experiments/test_sym.py           # symmetry breaking; ends with ALL OK
+.venv/bin/python experiments/test_runner_resume.py # resume and skip logic of run_all.py
 ```
 
 ## Running experiments
 
 ```bash
-uv run python -u experiments/run_all.py --ns 100 200 --reps 3 --timeout 300 --mem-gb 5 \
+.venv/bin/python -u experiments/run_all.py --ns 100 200 --reps 3 --timeout 300 --mem-gb 5 \
     --encs commander product --solvers glucose gurobi --out results/demo.csv
 ```
 
@@ -89,7 +89,7 @@ Running the same command again resumes from the CSV and skips finished runs.
 
 | Experiment | How to reproduce | Output |
 |---|---|---|
-| E1 CNF sizes | `uv run python experiments/e1_sizes.py` | `results/e1_sizes.csv` |
+| E1 CNF sizes | `.venv/bin/python experiments/e1_sizes.py` | `results/e1_sizes.csv` |
 | E2 encodings, Glucose (Linux) | `--ns 16 32 50 64 --solvers glucose --out results/e2_encoding_glucose.csv` (the original command was not saved; this is the same configuration) | `results/e2_encoding_glucose.csv` |
 | E2 (Windows) | `experiments/e2_encoding_glucose.py` | `results/e2_windows_glucose.csv` |
 | E4 solver comparison, E5 symmetry | `scripts/run_e4_e5.sh` | `results/e4_vm.csv`, `e5_nosym.csv`, `e5_sym.csv` |
@@ -102,7 +102,7 @@ Gurobi and CPLEX were not run on AWS.
 ## Analysis
 
 ```bash
-uv run python experiments/analyze.py results/e1_sizes.csv results/e2_encoding_glucose.csv \
+.venv/bin/python experiments/analyze.py results/e1_sizes.csv results/e2_encoding_glucose.csv \
     results/e2_windows_glucose.csv results/e4_vm.csv results/e5_nosym.csv \
     results/e5_sym.csv results/large_commander_product.csv
 ```
