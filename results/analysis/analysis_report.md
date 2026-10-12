@@ -63,6 +63,64 @@ E1 measures the number of variables and clauses; it does not measure solver runt
 | 100 | product | OK | 19492 | 116672 |
 | 100 | seqcounter | OK | 49402 | 117812 |
 
+## E2: Glucose encoding comparison (Linux VM)
+
+Rows are ranked by median parent-measured t_total among SAT runs. This includes worker startup overhead.
+
+| N | Rank | Encoding | Median t_total (s) | Variables | Clauses |
+|---:|---:|---|---:|---:|---:|
+| 16 | 1 | pairwise | 0.100900 | 256 | 6,352 |
+| 16 | 2 | seqcounter | 0.101200 | 1,186 | 2,732 |
+| 16 | 3 | commander | 0.125100 | 682 | 3,052 |
+| 16 | 4 | bitwise | 0.257200 | 568 | 3,924 |
+| 16 | 5 | product | 0.577500 | 864 | 2,856 |
+| 32 | 1 | pairwise | 0.089600 | 1,024 | 52,640 |
+| 32 | 2 | commander | 0.127400 | 2,956 | 13,290 |
+| 32 | 3 | seqcounter | 0.228600 | 4,930 | 11,596 |
+| 32 | 4 | bitwise | 5.838700 | 1,846 | 19,796 |
+| 32 | 5 | product | 8.062500 | 2,796 | 11,928 |
+| 50 | 1 | pairwise | 0.221900 | 2,500 | 203,450 |
+| 50 | 2 | commander | 0.745900 | 7,354 | 33,420 |
+| 50 | 3 | bitwise | 2.101100 | 4,032 | 57,240 |
+| 50 | 4 | seqcounter | 2.258900 | 12,202 | 28,912 |
+| 50 | 5 | product | 17.555800 | 5,954 | 29,430 |
+| 64 | 1 | commander | 0.408100 | 11,958 | 55,022 |
+| 64 | 2 | pairwise | 0.412900 | 4,096 | 428,864 |
+| 64 | 3 | bitwise | 13.580600 | 6,132 | 95,572 |
+| 64 | 4 | product | 19.760300 | 8,968 | 47,448 |
+| 64 | 5 | seqcounter | 29.017700 | 20,098 | 47,756 |
+
+Windows and Linux VM results use different execution environments and timing setups. Do not compare their absolute runtimes as if they came from one controlled machine.
+
+## E2: Glucose encoding comparison (Windows)
+
+Rows are ranked by median parent-measured t_total among SAT runs. This includes worker startup overhead.
+
+| N | Rank | Encoding | Median t_total (s) | Variables | Clauses |
+|---:|---:|---|---:|---:|---:|
+| 16 | 1 | pairwise | 0.138946 | 256 | 6,352 |
+| 16 | 2 | seqcounter | 0.141931 | 1,186 | 2,732 |
+| 16 | 3 | commander | 0.174536 | 682 | 3,052 |
+| 16 | 4 | bitwise | 0.234967 | 568 | 3,924 |
+| 16 | 5 | product | 0.520475 | 864 | 2,856 |
+| 32 | 1 | pairwise | 0.163004 | 1,024 | 52,640 |
+| 32 | 2 | commander | 0.188769 | 2,956 | 13,290 |
+| 32 | 3 | seqcounter | 0.264909 | 4,930 | 11,596 |
+| 32 | 4 | bitwise | 6.011641 | 1,846 | 19,796 |
+| 32 | 5 | product | 8.365509 | 2,796 | 11,928 |
+| 50 | 1 | pairwise | 0.250557 | 2,500 | 203,450 |
+| 50 | 2 | commander | 0.706072 | 7,354 | 33,420 |
+| 50 | 3 | seqcounter | 1.737585 | 12,202 | 28,912 |
+| 50 | 4 | bitwise | 1.909677 | 4,032 | 57,240 |
+| 50 | 5 | product | 19.225835 | 5,954 | 29,430 |
+| 64 | 1 | pairwise | 0.405443 | 4,096 | 428,864 |
+| 64 | 2 | commander | 0.405920 | 11,958 | 55,022 |
+| 64 | 3 | product | 15.635375 | 8,968 | 47,448 |
+| 64 | 4 | bitwise | 15.703872 | 6,132 | 95,572 |
+| 64 | 5 | seqcounter | 31.850088 | 20,098 | 47,756 |
+
+Windows and Linux VM results use different execution environments and timing setups. Do not compare their absolute runtimes as if they came from one controlled machine.
+
 ## Status totals by input file and N
 
 | Dataset | N | OK | SAT | TO | MO | ERR | UNSAT | SKIP |

@@ -220,6 +220,50 @@ def main():
             f"{r['nvars']} | {r['nclauses']} |"
         )
 
+    # E2 runtime comparisons, kept separate by environment.
+    for dataset, label in (
+        ("e2_encoding_glucose.csv", "Linux VM"),
+        ("e2_windows_glucose.csv", "Windows"),
+    ):
+        selected = [
+            r for r in summary
+            if r["dataset"] == dataset
+            and int(r["sat_runs_used_for_medians"]) > 0
+        ]
+        if not selected:
+            continue
+
+        report += [
+            "",
+            f"## E2: Glucose encoding comparison ({label})",
+            "",
+            "Rows are ranked by median parent-measured t_total among SAT runs. "
+            "This includes worker startup overhead.",
+            "",
+            "| N | Rank | Encoding | Median t_total (s) | Variables | Clauses |",
+            "|---:|---:|---|---:|---:|---:|",
+        ]
+
+        for n in sorted({int(r["n"]) for r in selected}):
+            group = sorted(
+                [r for r in selected if int(r["n"]) == n],
+                key=lambda r: float(r["median_t_total_sat_s"]),
+            )
+            for rank, r in enumerate(group, start=1):
+                report.append(
+                    f"| {n} | {rank} | {r['encoding']} | "
+                    f"{float(r['median_t_total_sat_s']):.6f} | "
+                    f"{float(r['median_nvars_sat']):,.0f} | "
+                    f"{float(r['median_nclauses_sat']):,.0f} |"
+                )
+
+        report += [
+            "",
+            "Windows and Linux VM results use different execution environments "
+            "and timing setups. Do not compare their absolute runtimes as if "
+            "they came from one controlled machine.",
+        ]
+
     report += [
         "",
         "## Status totals by input file and N",
