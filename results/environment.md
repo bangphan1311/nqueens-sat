@@ -1,15 +1,15 @@
 # Environment
 
-Generated: 2026-10-07
+Generated: 2026-10-12
 
 ## Machine
 
 | Item | Value |
 |---|---|
-| OS | Ubuntu 26.04.1 LTS (x86_64) |
-| CPU | AMD Ryzen 5 7535HS with Radeon Graphics |
+| OS | Ubuntu 26.04 LTS (x86_64) |
+| CPU | Intel(R) Xeon(R) Platinum 8275CL CPU @ 3.00GHz |
 | Logical cores | 4 |
-| RAM | 7.2 GiB |
+| RAM | 7.5 GiB |
 | Environment | virtual machine |
 
 ## Software
