@@ -13,12 +13,12 @@ WORKER = os.path.join(HERE, "..", "src", "nqsat", "worker.py")
 SAT_SOLVERS = ["cadical", "glucose", "cryptominisat", "kissat"]
 ENCODINGS = ["pairwise", "seqcounter", "bitwise", "commander", "product"]
 BASELINES = ["cpsat", "cpsat_bool", "gurobi", "cplex_mip", "cplex_cp"]
-FIELDS = ["n", "solver", "encoding", "rep", "nvars", "nclauses",
+FIELDS = ["n", "solver", "encoding", "sym", "rep", "nvars", "nclauses",
           "t_encode", "t_solve", "t_total", "status"]
 
 
-def run_one(solver, enc, n, timeout, mem):
-    cmd = [sys.executable, WORKER, solver, enc, str(n), str(timeout), str(mem)]
+def run_one(solver, enc, n, timeout, mem, sym=False):
+    cmd = [sys.executable, WORKER, solver, enc, str(n), str(timeout), str(mem), "1" if sym else "0"]
     grace = 0 if solver in SAT_SOLVERS else 20
     t0 = time.perf_counter()
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
@@ -62,6 +62,8 @@ def main():
     ap.add_argument("--mem-gb", type=float, default=5)
     ap.add_argument("--out", default="results/results.csv")
     ap.add_argument("--solvers", nargs="+", default=SAT_SOLVERS + BASELINES)
+    ap.add_argument("--encs", nargs="+", default=ENCODINGS)
+    ap.add_argument("--sym", action="store_true")
     a = ap.parse_args()
 
     os.makedirs(os.path.dirname(a.out) or ".", exist_ok=True)
@@ -74,7 +76,7 @@ def main():
 
     configs = []
     for s in a.solvers:
-        for e in (ENCODINGS if s in SAT_SOLVERS else ["-"]):
+        for e in (a.encs if s in SAT_SOLVERS else ["-"]):
             configs.append((s, e))
 
     for n in sorted(a.ns):
@@ -86,11 +88,11 @@ def main():
                     row = {"status": "SKIP", "nvars": 0, "nclauses": 0,
                            "t_encode": 0, "t_solve": 0, "t_total": 0}
                 else:
-                    row = run_one(s, e, n, a.timeout, a.mem_gb)
+                    row = run_one(s, e, n, a.timeout, a.mem_gb, a.sym)
                     if rep == 0 and row["status"] in ("TO", "MO"):
                         failed.add((s, e))
                 row.pop("error", None)
-                row.update(n=n, solver=s, encoding=e, rep=rep)
+                row.update(n=n, solver=s, encoding=e, sym=int(a.sym), rep=rep)
                 w.writerow({k: (round(v, 4) if isinstance(v, float) else v)
                             for k, v in row.items() if k in FIELDS})
                 f.flush()

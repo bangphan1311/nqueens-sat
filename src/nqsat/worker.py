@@ -19,6 +19,7 @@ STATUS = {"SAT": "SAT", "UNSAT": "UNSAT", "TIMEOUT": "TO", "ERROR": "ERR"}
 
 def main():
     solver, enc = sys.argv[1], sys.argv[2]
+    sym = len(sys.argv) > 6 and sys.argv[6] == "1"
     n, tl, mem_gb = int(sys.argv[3]), float(sys.argv[4]), float(sys.argv[5])
     limit = int(mem_gb * 1024 ** 3)
     resource.setrlimit(resource.RLIMIT_AS, (limit, limit))
@@ -30,7 +31,7 @@ def main():
             from nqsat import solvers_sat as S
             from nqsat.encode import build_cnf
             t0 = time.perf_counter()
-            clauses, top = build_cnf(n, S.AMO[enc])
+            clauses, top = build_cnf(n, S.AMO[enc], sym)
             out["t_encode"] = time.perf_counter() - t0
             out["nvars"], out["nclauses"] = top, len(clauses)
             t1 = time.perf_counter()
