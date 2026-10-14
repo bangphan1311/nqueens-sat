@@ -1,0 +1,76 @@
+% Tables for the encoding-complexity section.
+% Derived from the formulas supplied for src/nqsat/amo.py and src/nqsat/encode.py.
+% Include in a paper after loading booktabs and amsmath.
+
+\begin{table}[t]
+\centering
+\caption{Size of a single at-most-one (AMO) encoding on a line of $k$ literals.
+Exact formulas follow the implementation; asymptotic commander expressions are not exact counts.}
+\label{tab:amo-blocks}
+\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+Encoding & Auxiliary variables & Clauses \\
+\midrule
+Pairwise
+  & $0$
+  & $\binom{k}{2}$ \\
+Sequential counter ($k\ge 2$)
+  & $k-1$
+  & $3k-4$ \\
+Binary (bitwise), $k=2$
+  & $0$
+  & $1$ \\
+Binary (bitwise), $k\ge 3$
+  & $\lceil\log_2 k\rceil$
+  & $k\lceil\log_2 k\rceil$ \\
+Commander
+  & $\frac{k}{2}+O(\log k)$
+  & $\frac{7k}{2}+O(\log k)$ \\
+Product ($k\ge 2$)
+  & $p+q$
+  & $\binom{p}{2}+\binom{q}{2}+2k$ \\
+\bottomrule
+\end{tabular}
+
+\vspace{2pt}
+\begin{minipage}{0.96\linewidth}
+\footnotesize
+For $k\le 1$, all five implementations generate zero auxiliary variables and zero AMO clauses. For the product encoding, $p=\lceil\sqrt{k}\rceil$ and $q=\lceil k/p\rceil$. The commander expressions are asymptotic bounds for the recursive implementation with group size three.
+\end{minipage}
+\end{table}
+
+\begin{table}[t]
+\centering
+\caption{Size of the complete N-Queens CNF. The model contains $N^2$ board variables,
+AMO constraints on rows, columns and both diagonal families, and $2N$ at-least-one (ALO) clauses.}
+\label{tab:cnf-size}
+\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+Encoding & Auxiliary variables & Total clauses \\
+\midrule
+Pairwise
+  & $0$
+  & $\frac{5}{3}N^3-2N^2+\frac{7}{3}N$ \\
+Sequential counter ($N\ge 2$)
+  & $4N^2-6N+2$
+  & $12N^2-22N+12$ \\
+Binary (bitwise)
+  & $\Theta(N\log N)$
+  & $\Theta(N^2\log N)$ \\
+Commander
+  & $2N^2+O(N\log N)$
+  & $14N^2+O(N\log N)$ \\
+Product
+  & $\Theta(N^{3/2})$
+  & $12N^2+O(N^{3/2})$ \\
+\bottomrule
+\end{tabular}
+
+\vspace{2pt}
+\begin{minipage}{0.96\linewidth}
+\footnotesize
+The pairwise clause expression is exact for this encoding, including the $2N$ ALO clauses. The sequential-counter expressions are exact for $N\ge2$. The remaining rows state asymptotic growth; lower-order terms depend on line lengths and implementation details. These are encoding-size bounds, not runtime predictions.
+\end{minipage}
+\end{table}
