@@ -207,8 +207,9 @@ runtime comparisons as if they were controlled on identical hardware.
 ## 7. Environment information
 
 The local VM software and hardware information is documented in
-`results/environment.md`. Record AWS and Windows environment information
-separately when reporting results from those machines.
+`results/environment_vm.md`, and the AWS machine in `results/environment_aws.md`.
+Record Windows environment information separately when reporting results from
+that machine.
 
 The raw CSV files and logs are retained to support reproducibility. Summary
 statistics should be traceable to the corresponding source CSV, and `SKIP`

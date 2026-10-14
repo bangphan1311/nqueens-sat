@@ -129,7 +129,7 @@ and `status_counts.csv` to `results/analysis/`. Each input file is summarised se
 Timings from different machines are never pooled.
 
 - **Linux VM:** Ubuntu 26.04 VM on a laptop with an AMD Ryzen 5 7535HS, 4 vCPU, 7.2 GiB RAM
-  (`results/environment.md`). Used for E2 (Linux), E4 and E5.
-- **AWS:** EC2 `c5.xlarge`, Intel Xeon Platinum 8275CL, 4 vCPU, 7.5 GiB RAM, Ubuntu 26.04.
+  (`results/environment_vm.md`). Used for E2 (Linux), E4 and E5.
+- **AWS:** EC2 `c5.xlarge`, Intel Xeon Platinum 8275CL, 4 vCPU, 7.5 GiB RAM, Ubuntu 26.04 (`results/environment_aws.md`).
   Used for the large-N batch.
 - **Windows:** the E2 script run on the Windows laptop that hosts the VM.

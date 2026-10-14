@@ -1,0 +1,6 @@
+dataset,SAT,UNSAT,TO,MO,ERR,SKIP
+E2 Linux VM,60,0,0,0,0,0
+E4 Linux VM,150,0,1,0,0,5
+E5 no sym,18,0,0,0,0,0
+E5 sym,18,0,0,0,0,0
+AWS large N,51,0,2,0,0,7
