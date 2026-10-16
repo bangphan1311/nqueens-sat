@@ -1,16 +1,23 @@
-# Python-generated files
+# Python bytecode and caches
 __pycache__/
-*.py[oc]
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Build and packaging artifacts
 build/
 dist/
 wheels/
-*.egg-info
+*.egg-info/
 
 # Virtual environments
-.venv
 .venv/
-__pycache__/
-*.pyc
+venv/
+figvenv/
+
+# Local environment and licenses
 .env
+.env.*
 *.lic
 gurobi.lic

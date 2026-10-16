@@ -1,135 +1,196 @@
-# N-Queens SAT benchmark
+# N-Queens SAT Benchmark
 
-Benchmark of SAT encodings and solvers on the N-Queens feasibility problem
-(place N non-attacking queens on an N x N board). N-Queens has a direct O(N)
-construction, so the goal is to compare formulations and solvers, not to find
-the best way to solve N-Queens.
+An empirical study of CNF encodings and exact solvers for the N-Queens
+feasibility problem. The project compares encoding size, solver runtime,
+formulations, symmetry breaking, and execution environments.
+
+A smaller CNF does not necessarily solve faster. Encoding-size results
+and runtime measurements are therefore treated as separate experiments.
 
 ## What is compared
 
-- **SAT solvers:** CaDiCaL (PySAT `cadical153`), Glucose 4 (PySAT `glucose4`),
-  CryptoMiniSat (`pycryptosat`), Kissat (external binary, called through a DIMACS file).
-- **At-most-one encodings:** pairwise, sequential counter (`seqcounter`),
-  binary (`bitwise`), commander, product. See `src/nqsat/amo.py`.
-- **Baselines:** OR-Tools CP-SAT (AllDifferent model and Boolean model), Gurobi (MIP),
-  CPLEX MIP, CPLEX CP Optimizer.
-- Every solution returned by any solver is checked by the independent verifier
-  `src/nqsat/verify.py`. A solution that fails the check is recorded as `ERR`.
+- **CNF encodings:** pairwise, sequential counter, bitwise, commander,
+  and product.
+- **SAT solvers:** CaDiCaL, Glucose, CryptoMiniSat, and Kissat.
+- **Exact-solver baselines:** CP-SAT, Boolean CP-SAT, Gurobi MIP,
+  CPLEX MIP, and CPLEX CP.
+- **Symmetry breaking:** selected configurations with and without it.
+- **Environments:** Linux VM, separate Windows E2 runs, and AWS EC2.
+
+See [PROTOCOL.md](PROTOCOL.md) for experiment configurations,
+measurement rules, limits, and interpretation caveats.
 
 ## Repository layout
 
-| Path | Content |
+| Path | Purpose |
 |---|---|
-| `src/nqsat/` | encodings (`amo.py`, `encode.py`), solver wrappers (`solvers_*.py`), `worker.py`, `verify.py`, `status.py` |
-| `experiments/run_all.py` | main benchmark runner (one worker process per run) |
-| `experiments/analyze.py` | summarises result CSVs into `results/analysis/` |
-| `experiments/e1_sizes.py`, `e2_encoding_glucose.py` | E1 (CNF size) and the Windows E2 script |
-| `experiments/test_*.py`, `smoke_test.py` | correctness tests |
-| `scripts/` | `run_e4_e5.sh`, `setup_cplex_license.sh` |
-| `results/` | raw CSVs and logs of every reported experiment |
-| `PROTOCOL.md` | exact measurement protocol; read it before interpreting any number |
+| `src/nqsat/` | Encodings, solver adapters, status handling, verification |
+| `experiments/` | Experiment runners, analysis, checks, figure generation |
+| `scripts/` | Experiment orchestration and CPLEX setup helper |
+| `results/` | Raw benchmark CSVs, logs, environment records, summaries |
+| `results/exploratory/` | Preliminary pilot/scout results |
+| `results/analysis/` | Derived tables and analysis report |
+| `figures/` | Exported PDF/PNG figures and plotted-data CSVs |
+| `paper/` | Reusable LaTeX fragments for models and complexity tables |
+| `PROTOCOL.md` | Experimental methodology and dataset documentation |
 
-## Setup (Linux x86_64)
+## Environment and setup
 
-Requirements: Python >= 3.10, [uv](https://docs.astral.sh/uv/), a C compiler and `make`.
+Python 3.10 or later is required. A C compiler and `make` may be needed
+for SAT-solver binaries. Gurobi and CPLEX require suitable installations
+and licenses.
 
-1. Python environment: `uv sync`
-2. Kissat (expected at `~/kissat/build/kissat`, see `KISSAT` in `src/nqsat/solvers_sat.py`):
+### Python environment
+
+For a fresh checkout, create the environment and install locked
+dependencies:
+
+    uv sync --locked
+
+**Caution:** the established benchmark VM's `.venv` contains a manually
+patched CPLEX library. Running `uv sync` there can replace that library.
+Do not resynchronize this existing environment casually.
+
+Use the configured interpreter directly on that machine:
+
+    .venv/bin/python --version
+    .venv/bin/python experiments/run_all.py --help
+
+This avoids implicit environment synchronization by `uv run`.
+Solver binaries and license files are machine-specific and should not
+be committed.
+
+### Plotting environment
+
+Figure generation needs Matplotlib. Keep it in a separate environment
+if the project `.venv` must retain the patched CPLEX installation.
+The figure script reads CSVs only; it does not launch solvers.
+
+To generate a preview without overwriting tracked figures:
+
+    mkdir -p /tmp/nqsat-figures
+    ~/figvenv/bin/python experiments/make_figures.py \
+      --results results --out /tmp/nqsat-figures
+
+Adjust the plotting interpreter path if needed. Using `--out figures`
+instead will overwrite the repository's figure and `data_*.csv` outputs.
+
+## Experiment datasets
+
+| Experiment | Dataset | Purpose |
+|---|---|---|
+| E1 | `results/e1_sizes.csv` | Variable and clause counts; no solving |
+| E2 Linux | `results/e2_encoding_glucose.csv` | Encoding comparison using Glucose |
+| E2 Windows | `results/e2_windows_glucose.csv` | Separate Windows measurements |
+| E4 | `results/e4_vm.csv` | SAT configurations and exact-solver baselines |
+| E5, no symmetry | `results/e5_nosym.csv` | Selected configurations without symmetry breaking |
+| E5, symmetry | `results/e5_sym.csv` | Corresponding configurations with symmetry breaking |
+| AWS large-N | `results/large_commander_product.csv` | Larger instances on a separate AWS environment |
+
+See `PROTOCOL.md` for detailed configurations and
+`results/environment_vm.md` and `results/environment_aws.md` for
+the recorded machine environments.
+
+Historical CSVs and logs are experimental evidence. Rerunning an
+experiment creates new measurements; it should not silently replace
+the recorded results. Do not compare absolute runtime across different
+machines as if the environment were controlled.
+
+## Running experiments
+
+Inspect the available options before launching a run:
+
+    .venv/bin/python experiments/run_all.py --help
+    .venv/bin/python experiments/e1_sizes.py --help
+
+The E4/E5 script invokes the configured project interpreter:
+
+    bash scripts/run_e4_e5.sh
+
+**Warning:** E4/E5 writes experiment outputs. Review the script and
+output paths before running it, especially when preserving the
+recorded results. Do not rerun benchmarks merely to inspect the
+repository or regenerate figures.
+
+The exact original invocation for Linux E2 was not retained in a
+dedicated experiment log. Consult `PROTOCOL.md` for the documented
+configuration rather than assuming undocumented command-line options.
+
+## Analysis and figures
+
+- `experiments/analyze.py` generates summaries from result CSVs.
+- `experiments/make_figures.py` creates PDF/PNG figures and matching
+  `data_*.csv` files from the recorded datasets.
+- `results/analysis/` contains derived tables and the analysis report.
+- `figures/data_*.csv` records the data used by the exported figures.
+
+Inspect a script's help output before running it. Analysis and figure
+generation should not require rerunning a solver.
+
+## Correctness and methodology
+
+The implementation includes solution verification and encoding
+complexity checks. Results distinguish successful solves, timeouts,
+memory-outs, and skipped runs. A `SKIP` is not a solver outcome.
+
+Runtime includes the timing scope defined by the experiment runner;
+this may include process startup and model or instance preparation.
+Interpret successful-run summaries together with failure outcomes.
+See `PROTOCOL.md` for further methodological details and limitations.
+
+## Licensing
+
+Third-party solvers have their own licensing terms. Gurobi and CPLEX
+may require academic or commercial licenses depending on the
+installation and use. Their libraries, license files, and local
+solver binaries are not bundled with this repository.
+
+## External solver setup
+
+### Kissat
+
+The default binary path is `~/kissat/build/kissat`.
+
 ```bash
-   git clone --depth 1 https://github.com/arminbiere/kissat.git ~/kissat
-   cd ~/kissat && ./configure && make -j4
+git clone --depth 1 https://github.com/arminbiere/kissat.git ~/kissat
+cd ~/kissat
+./configure
+make -j4
+cd ~/nqueens-sat
 ```
-3. Gurobi: put your own licence at `~/.gurobi/gurobi.lic` and run
-   `export GRB_LICENSE_FILE=$HOME/.gurobi/gurobi.lic`.
-4. CPLEX: the pip package is the Community Edition (about 1000 variables).
-   Install IBM CPLEX Studio with a valid academic licence, then replace the library:
+
+### Gurobi
+
+Install Gurobi and configure a valid license. For a license at
+`~/.gurobi/gurobi.lic`, set:
+
 ```bash
-   scripts/setup_cplex_license.sh --check   # report only
-   scripts/setup_cplex_license.sh           # patch
+export GRB_LICENSE_FILE="$HOME/.gurobi/gurobi.lic"
 ```
-   The Studio path is set by `CPLEX_STUDIO` (default `~/ibm/ILOG/CPLEX_Studio2211`).
-   The CP Optimizer binary path is set in `src/nqsat/solvers_cplex_cp.py`.
 
-Gurobi and CPLEX academic licences are for non-commercial use. Check their terms
-before installing on a new machine. Licence files are git-ignored; never commit them.
+### CPLEX
 
-**uv and the CPLEX patch:** `uv sync` recreates the Community library, so patch again
-after it. To make sure uv never touches a patched environment, run commands with
-`.venv/bin/python` instead of `uv run` (or use `uv run --no-sync`).
+Install IBM ILOG CPLEX Optimization Studio with a suitable license.
+Check the configured installation before patching the Python library:
+
+```bash
+scripts/setup_cplex_license.sh --check
+scripts/setup_cplex_license.sh
+```
+
+The Studio path is controlled by `CPLEX_STUDIO`. Check the CP Optimizer
+binary path in `src/nqsat/solvers_cplex_cp.py`. License files must not
+be committed. On the benchmark VM, `.venv` contains a patched CPLEX
+library; avoid running `uv sync` there because it may replace the patch.
 
 ## Tests
+
+Run these checks when validating code changes; they are not benchmarks:
 
 ```bash
 .venv/bin/python -m compileall -q src experiments
 .venv/bin/python experiments/smoke_test.py
-.venv/bin/python experiments/test_encoding.py      # known solution counts, N = 1..10, 5 encodings
-.venv/bin/python experiments/test_sym.py           # symmetry breaking; ends with ALL OK
-.venv/bin/python experiments/test_runner_resume.py # resume and skip logic of run_all.py
+.venv/bin/python experiments/test_encoding.py
+.venv/bin/python experiments/test_sym.py
+.venv/bin/python experiments/test_runner_resume.py
 ```
-
-## Running experiments
-
-```bash
-.venv/bin/python -u experiments/run_all.py --ns 100 200 --reps 3 --timeout 300 --mem-gb 5 \
-    --encs commander product --solvers glucose gurobi --out results/demo.csv
-```
-
-| Option | Meaning | Default |
-|---|---|---|
-| `--ns` | board sizes | 8 16 32 50 100 200 300 500 1000 |
-| `--reps` | repetitions per configuration | 3 |
-| `--timeout` | seconds per run | 300 |
-| `--mem-gb` | address-space limit of a run (`RLIMIT_AS`) | 5 |
-| `--solvers` | `cadical glucose cryptominisat kissat cpsat cpsat_bool gurobi cplex_mip cplex_cp` | all |
-| `--encs` | SAT encodings: `pairwise seqcounter bitwise commander product` | all |
-| `--sym` | symmetry breaking (SAT solvers) | off |
-| `--out` | output CSV | `results/results.csv` |
-
-Running the same command again resumes from the CSV and skips finished runs.
-
-| Experiment | How to reproduce | Output |
-|---|---|---|
-| E1 CNF sizes | `.venv/bin/python experiments/e1_sizes.py` | `results/e1_sizes.csv` |
-| E2 encodings, Glucose (Linux) | `--ns 16 32 50 64 --solvers glucose --out results/e2_encoding_glucose.csv` (the original command was not saved; this is the same configuration) | `results/e2_encoding_glucose.csv` |
-| E2 (Windows) | `experiments/e2_encoding_glucose.py` | `results/e2_windows_glucose.csv` |
-| E4 solver comparison, E5 symmetry | `scripts/run_e4_e5.sh` | `results/e4_vm.csv`, `e5_nosym.csv`, `e5_sym.csv` |
-| Large N on AWS | `--ns 500 1000 --reps 3 --timeout 300 --mem-gb 5 --encs commander product --solvers cadical glucose cryptominisat kissat cpsat cpsat_bool` | `results/large_commander_product.csv` |
-
-The AWS batch was run with an earlier revision of the runner; the encoding list was
-restricted by editing it, which is equivalent to `--encs commander product`.
-Gurobi and CPLEX were not run on AWS.
-
-## Analysis
-
-```bash
-.venv/bin/python experiments/analyze.py results/e1_sizes.csv results/e2_encoding_glucose.csv \
-    results/e2_windows_glucose.csv results/e4_vm.csv results/e5_nosym.csv \
-    results/e5_sym.csv results/large_commander_product.csv
-```
-
-Writes `analysis_report.md`, `encoding_size_summary.csv`, `solver_encoding_summary.csv`
-and `status_counts.csv` to `results/analysis/`. Each input file is summarised separately.
-
-## Reading the results
-
-- Columns: `n, solver, encoding, sym, rep, nvars, nclauses, t_encode, t_solve, t_total, status`.
-- Status: `SAT`, `UNSAT`, `TO` (timeout), `MO` (memory error), `ERR` (error or failed
-  verification), `SKIP` (not run because an earlier repetition 0 timed out or ran out of
-  memory for that configuration and N; a skip is not a measured timeout).
-- `t_total` is the wall time of the whole worker process, including start-up and imports.
-  It is not `t_encode + t_solve`. For Kissat, `t_solve` also includes writing the DIMACS
-  file and starting the process.
-- The memory limit is `RLIMIT_AS` (virtual address space), not resident memory.
-- `rep` numbers the repetitions. It is not a random seed, and the clause order is not
-  shuffled. Repetitions only show timing variation between identical runs.
-- All solvers run with one thread (see `PROTOCOL.md`).
-
-## Machines
-
-Timings from different machines are never pooled.
-
-- **Linux VM:** Ubuntu 26.04 VM on a laptop with an AMD Ryzen 5 7535HS, 4 vCPU, 7.2 GiB RAM
-  (`results/environment_vm.md`). Used for E2 (Linux), E4 and E5.
-- **AWS:** EC2 `c5.xlarge`, Intel Xeon Platinum 8275CL, 4 vCPU, 7.5 GiB RAM, Ubuntu 26.04 (`results/environment_aws.md`).
-  Used for the large-N batch.
-- **Windows:** the E2 script run on the Windows laptop that hosts the VM.
